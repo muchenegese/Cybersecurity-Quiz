@@ -1,0 +1,13 @@
+# Build output
+kwiqtest
+kwiqtest.exe
+dist/
+
+# Runtime data (quizzes, sessions, uploaded media)
+kwiqtest-data/
+
+# Test artefacts
+tests/node_modules/
+tests/test-results/
+tests/playwright-report/
+tests/.tmp-data/

@@ -1,0 +1,814 @@
+/* ============================================================================
+   KwiqTest — design system
+
+   Mobile-first and dark by default. Most participants arrive by scanning a QR
+   code with a phone, often in a dimly lit room with the quiz projected on a
+   screen, so a dark surface with vivid answer cards reads better and is kinder
+   to both eyes and battery than a white sheet. Every foreground/background pair
+   below clears WCAG 2.1 AA (4.5:1); the answer colours also carry a distinct
+   shape glyph so they stay distinguishable without colour vision.
+   ========================================================================= */
+
+:root {
+  --bg:          #0a0c18;
+  --bg-grad-1:   #171b3d;
+  --bg-grad-2:   #0a0c18;
+  --surface:     #161a33;
+  --surface-2:   #1e2342;
+  --surface-3:   #272d52;
+  --border:      #313860;
+  --text:        #f3f4fb;
+  --muted:       #a7adcd;
+  --muted-dim:   #7c83a8;
+
+  --brand:       #7b6bff;
+  --brand-ink:   #ffffff;
+  --brand-dim:   #4c3fd4;
+  --brand-glow:  rgba(123, 107, 255, .35);
+
+  --good:        #34d399;
+  --good-deep:   #12805c;
+  --bad:         #fb7185;
+  --bad-deep:    #9f1239;
+  --warn:        #fbbf24;
+
+  --gold:        #f5c518;
+  --silver:      #cbd5e1;
+  --bronze:      #e08b4c;
+
+  /* Answer palette — each pair is >=4.5:1 against white text */
+  --opt-a: #cc2b3d;  --opt-b: #1d4ed8;  --opt-c: #b45309;
+  --opt-d: #15803d;  --opt-e: #7e22ce;  --opt-f: #0e7490;
+
+  --r-sm: 8px;  --r-md: 14px;  --r-lg: 20px;  --r-xl: 28px;
+  --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px;  --sp-7: 48px;
+
+  --shadow: 0 10px 30px -12px rgba(0, 0, 0, .7);
+  --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, .85);
+
+  --tap: 52px;               /* minimum interactive height */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+/* --------------------------------------------------------------- reset --- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;   /* stop iOS enlarging text in landscape */
+  scroll-behavior: smooth;
+  /* Thin, dark scrollbars everywhere — the OS default light scrollbar clashes
+     hard with a dark surface, and this app is mostly used in dim rooms. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-3) transparent;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background-color: var(--surface-3);
+  border-radius: 999px;
+  border: 2px solid var(--bg-grad-2);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: var(--brand-dim); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  background-image:
+    radial-gradient(1100px 620px at 12% -10%, #2b2467 0%, transparent 60%),
+    radial-gradient(900px 520px at 92% 4%, #123a52 0%, transparent 55%),
+    linear-gradient(180deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 45%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3, h4 { margin: 0 0 var(--sp-2); line-height: 1.15; font-weight: 800; letter-spacing: -.02em; }
+h1 { font-size: clamp(1.7rem, 5vw, 2.6rem); }
+h2 { font-size: clamp(1.3rem, 3.6vw, 1.8rem); }
+h3 { font-size: 1.1rem; }
+p  { margin: 0 0 var(--sp-3); }
+a  { color: var(--brand); }
+
+img, video, svg { max-width: 100%; height: auto; display: block; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+/* A visible focus ring everywhere — this app is used on shared screens and
+   keyboards, and the ring is the only cue a keyboard user gets. */
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* -------------------------------------------------------------- layout --- */
+
+#app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding:
+    calc(var(--sp-4) + env(safe-area-inset-top))
+    calc(var(--sp-4) + env(safe-area-inset-right))
+    calc(var(--sp-4) + env(safe-area-inset-bottom))
+    calc(var(--sp-4) + env(safe-area-inset-left));
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.screen--narrow { max-width: 560px; }
+.screen--wide   { max-width: 1400px; }
+.screen--center { justify-content: center; align-items: center; text-align: center; }
+
+.stack   { display: flex; flex-direction: column; gap: var(--sp-4); }
+.stack-2 { display: flex; flex-direction: column; gap: var(--sp-2); }
+.row     { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.row--between { justify-content: space-between; }
+.row--tight   { gap: var(--sp-2); }
+.grow    { flex: 1; min-width: 0; }
+.spacer  { flex: 1; }
+
+/* ---------------------------------------------------------- typography --- */
+
+.eyebrow {
+  text-transform: uppercase; letter-spacing: .14em;
+  font-size: .72rem; font-weight: 700; color: var(--muted);
+}
+.muted   { color: var(--muted); }
+.dim     { color: var(--muted-dim); }
+.small   { font-size: .85rem; }
+.tiny    { font-size: .75rem; }
+.center  { text-align: center; }
+.mono    { font-family: var(--mono); }
+.nowrap  { white-space: nowrap; }
+
+.brandmark {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-weight: 900; font-size: 1.15rem; letter-spacing: -.03em;
+  /* It is a link home, so it has to be as tappable as any other control. */
+  min-height: var(--tap); padding: 4px 2px;
+}
+.brandmark .dot {
+  width: 26px; height: 26px; border-radius: 9px;
+  background: linear-gradient(140deg, var(--brand), #f472b6);
+  display: grid; place-items: center; font-size: .85rem; color: #fff;
+  box-shadow: 0 6px 18px -6px var(--brand-glow);
+}
+
+/* --------------------------------------------------------------- cards --- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  box-shadow: var(--shadow);
+}
+.card--flat  { box-shadow: none; background: var(--surface-2); }
+.card--tight { padding: var(--sp-4); }
+.card--glass { background: rgba(28, 32, 62, .72); backdrop-filter: blur(12px); }
+
+.panel {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+
+.divider { height: 1px; background: var(--border); border: 0; margin: var(--sp-4) 0; }
+
+/* ------------------------------------------------------------- buttons --- */
+
+.btn {
+  --btn-bg: var(--surface-3);
+  --btn-ink: var(--text);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: var(--tap);
+  padding: 0 var(--sp-5);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--btn-bg);
+  color: var(--btn-ink);
+  font-weight: 700; font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform .12s ease, filter .15s ease, box-shadow .15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;   /* removes the 300ms tap delay on mobile */
+  user-select: none;
+}
+.btn:hover:not(:disabled)  { filter: brightness(1.12); }
+.btn:active:not(:disabled) { transform: scale(.975); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.btn--primary {
+  --btn-bg: linear-gradient(135deg, var(--brand), #9b5cf6);
+  --btn-ink: var(--brand-ink);
+  border-color: transparent;
+  box-shadow: 0 10px 28px -12px var(--brand-glow);
+}
+.btn--good   { --btn-bg: linear-gradient(135deg, #10b981, #34d399); --btn-ink: #05231a; border-color: transparent; }
+.btn--danger { --btn-bg: transparent; --btn-ink: var(--bad); border-color: #6c2740; }
+.btn--ghost  { --btn-bg: transparent; }
+.btn--block  { width: 100%; }
+.btn--lg     { min-height: 62px; font-size: 1.1rem; padding: 0 var(--sp-6); }
+.btn--sm     { min-height: 40px; font-size: .88rem; padding: 0 var(--sp-3); border-radius: var(--r-sm); }
+.btn--icon   { padding: 0; width: var(--tap); }
+
+.btn-group { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+
+/* --------------------------------------------------------------- forms --- */
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > label { font-size: .82rem; font-weight: 700; color: var(--muted); }
+
+.input, .textarea, .select {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text);
+  /* 16px minimum stops iOS Safari zooming the viewport on focus */
+  font-size: 16px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+/* Fields swap the outline for a ring that hugs the rounded corners. It has to
+   be strong enough to satisfy WCAG's focus-appearance contrast on its own. */
+.input:focus, .textarea:focus, .select:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(123, 107, 255, .6);
+}
+.input::placeholder { color: var(--muted-dim); }
+.textarea { min-height: 84px; resize: vertical; line-height: 1.45; }
+
+.input--code {
+  font-family: var(--mono);
+  font-size: clamp(1.6rem, 8vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: .28em;
+  text-align: center;
+  text-indent: .28em;      /* re-centres text that letter-spacing pushed left */
+  min-height: 74px;
+}
+
+.switch { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 0; min-height: 44px; }
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.switch .track {
+  width: 46px; height: 27px; border-radius: 999px; flex: none;
+  background: var(--surface-3); border: 1px solid var(--border);
+  position: relative; transition: background .18s ease;
+}
+.switch .track::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 21px; height: 21px; border-radius: 50%;
+  background: var(--muted); transition: transform .18s ease, background .18s ease;
+}
+.switch input:checked + .track { background: var(--brand); border-color: var(--brand); }
+.switch input:checked + .track::after { transform: translateX(19px); background: #fff; }
+.switch input:focus-visible + .track { outline: 3px solid var(--brand); outline-offset: 2px; }
+.switch .switch-label { font-size: .92rem; }
+
+/* --------------------------------------------------------------- chips --- */
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 999px;
+  background: var(--surface-3); border: 1px solid var(--border);
+  font-size: .8rem; font-weight: 700; color: var(--muted);
+}
+.chip--live   { color: var(--good); border-color: var(--good-deep); background: rgba(52, 211, 153, .12); }
+.chip--warn   { color: var(--warn); border-color: #6b4c0e; background: rgba(251, 191, 36, .12); }
+.chip--brand  { color: #c4bbff; border-color: var(--brand-dim); background: rgba(123, 107, 255, .16); }
+.chip .pulse {
+  width: 8px; height: 8px; border-radius: 50%; background: currentColor;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+/* -------------------------------------------------------- answer cards --- */
+
+.answers {
+  display: grid;
+  gap: var(--sp-3);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 560px) { .answers { grid-template-columns: 1fr 1fr; } }
+.answers[data-count="2"] { grid-template-columns: 1fr; }
+@media (min-width: 560px) { .answers[data-count="2"] { grid-template-columns: 1fr 1fr; } }
+.answers[data-count="3"] > :last-child { grid-column: 1 / -1; }
+@media (min-width: 560px) { .answers[data-count="3"] > :last-child { grid-column: auto; } }
+
+.answer {
+  --c: var(--surface-3);
+  position: relative;
+  display: flex; align-items: center; gap: var(--sp-3);
+  min-height: 84px;
+  padding: var(--sp-4);
+  border: 2px solid transparent;
+  border-radius: var(--r-lg);
+  background: var(--c);
+  color: #fff;
+  font-size: 1.05rem; font-weight: 700; text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform .12s ease, box-shadow .18s ease, opacity .2s ease, filter .2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.answer::before {   /* subtle sheen so flat colour blocks do not look dead */
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(160deg, rgba(255,255,255,.18), rgba(255,255,255,0) 55%);
+  pointer-events: none;
+}
+.answer:hover:not(:disabled)  { filter: brightness(1.1); }
+.answer:active:not(:disabled) { transform: scale(.98); }
+.answer:disabled { cursor: default; }
+
+.answer .glyph {
+  flex: none;
+  width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center;
+  background: rgba(0, 0, 0, .28);
+  font-size: 1.15rem; font-weight: 900;
+}
+.answer .body { flex: 1; min-width: 0; }
+.answer .body img { border-radius: var(--r-sm); max-height: 130px; width: auto; margin: 0 auto; }
+
+.answer[data-opt="0"] { --c: var(--opt-a); }
+.answer[data-opt="1"] { --c: var(--opt-b); }
+.answer[data-opt="2"] { --c: var(--opt-c); }
+.answer[data-opt="3"] { --c: var(--opt-d); }
+.answer[data-opt="4"] { --c: var(--opt-e); }
+.answer[data-opt="5"] { --c: var(--opt-f); }
+
+.answer.is-chosen  { border-color: #fff; box-shadow: 0 0 0 4px rgba(255,255,255,.22); transform: scale(1.01); }
+.answer.is-correct { border-color: #fff; box-shadow: 0 0 0 4px rgba(52, 211, 153, .5); }
+.answer.is-muted   { opacity: .38; filter: grayscale(.55); }
+
+.answer .verdict {
+  flex: none; font-size: 1.4rem; line-height: 1;
+}
+.answer .tally {
+  flex: none; font-size: .82rem; font-weight: 800;
+  background: rgba(0,0,0,.3); padding: 4px 9px; border-radius: 999px;
+}
+
+/* --------------------------------------------------------------- timer --- */
+
+.timer { display: flex; align-items: center; gap: var(--sp-3); }
+.timer-ring { position: relative; width: 66px; height: 66px; flex: none; }
+.timer-ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+.timer-ring circle { fill: none; stroke-width: 7; stroke-linecap: round; }
+.timer-ring .track { stroke: var(--surface-3); }
+.timer-ring .value { stroke: var(--good); transition: stroke-dashoffset .25s linear, stroke .3s ease; }
+.timer-ring .num {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-weight: 900; font-size: 1.25rem; font-variant-numeric: tabular-nums;
+}
+.timer.is-warn  .value { stroke: var(--warn); }
+.timer.is-urgent .value { stroke: var(--bad); }
+.timer.is-urgent .num  { color: var(--bad); animation: tick 1s steps(2) infinite; }
+@keyframes tick { 50% { transform: scale(1.14); } }
+
+.timer-bar { height: 8px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.timer-bar > i { display: block; height: 100%; background: var(--good); transition: width .25s linear, background .3s ease; }
+.timer-bar.is-warn > i   { background: var(--warn); }
+.timer-bar.is-urgent > i { background: var(--bad); }
+
+/* ---------------------------------------------------------- join panel --- */
+
+.joincode {
+  font-family: var(--mono);
+  font-size: clamp(2.4rem, 12vw, 4.6rem);
+  font-weight: 900; letter-spacing: .12em;
+  line-height: 1;
+  background: linear-gradient(135deg, #fff, #b8aaff);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.qr-frame {
+  background: #fff; padding: 12px; border-radius: var(--r-md);
+  display: inline-block; line-height: 0;
+  box-shadow: var(--shadow);
+}
+.qr-frame img { width: 100%; max-width: 240px; }
+
+/* ---------------------------------------------------------- scroll box --- */
+
+/* A contained, independently scrollable region for lists that can grow
+   long — participants, the question list, standings — so they scroll in
+   place instead of stretching the whole page and forcing a long page
+   scroll to find the controls again. */
+.scroll-panel {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-3) transparent;
+}
+.scroll-panel::-webkit-scrollbar { width: 8px; }
+.scroll-panel::-webkit-scrollbar-thumb { background-color: var(--surface-3); border-radius: 999px; }
+.scroll-panel::-webkit-scrollbar-thumb:hover { background-color: var(--brand-dim); }
+.scroll-panel--sm { max-height: 240px; }
+.scroll-panel--md { max-height: 360px; }
+.scroll-panel--lg { max-height: 480px; }
+.scroll-panel--xl { max-height: 640px; }
+/* A little breathing room so the last row never sits flush against the
+   scrollbar track or the fading edge below. */
+.scroll-panel { padding-right: 2px; padding-bottom: 2px; }
+
+/* ------------------------------------------------------- participants --- */
+
+.people {
+  display: flex; flex-wrap: wrap; gap: var(--sp-2);
+  align-content: flex-start;
+}
+.person {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 13px 7px 8px; border-radius: 999px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  font-size: .9rem; font-weight: 600;
+  animation: pop .32s cubic-bezier(.2, 1.5, .4, 1);
+  max-width: 100%;
+}
+.person .face { font-size: 1.15rem; line-height: 1; }
+.person .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
+.person.is-answered { border-color: var(--good-deep); background: rgba(52, 211, 153, .13); }
+.person.is-offline  { opacity: .45; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* --------------------------------------------------------- leaderboard --- */
+
+.board { display: flex; flex-direction: column; gap: 6px; }
+.board-row {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  align-items: center; gap: var(--sp-3);
+  padding: 11px var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition: background .2s ease;
+}
+/* A row tint, not a lift or border glow, on hover — standings are read-only,
+   so the affordance should help scanning a long list without implying the
+   row is clickable. */
+.board-row:hover { background: var(--surface-3); }
+.board-row .rank { font-weight: 900; font-size: 1.05rem; text-align: center; color: var(--muted); }
+.board-row .who  { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.board-row .who .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.board-row .pts  { font-weight: 900; font-variant-numeric: tabular-nums; }
+.board-row .sub  { font-size: .74rem; color: var(--muted); font-weight: 600; }
+
+.board-row[data-rank="1"] { background: linear-gradient(100deg, rgba(245,197,24,.2), var(--surface-2) 62%); border-color: #8a6c05; }
+.board-row[data-rank="2"] { background: linear-gradient(100deg, rgba(203,213,225,.16), var(--surface-2) 62%); border-color: #5c6478; }
+.board-row[data-rank="3"] { background: linear-gradient(100deg, rgba(224,139,76,.18), var(--surface-2) 62%); border-color: #7d4a1f; }
+.board-row[data-rank="1"] .rank { color: var(--gold); }
+.board-row[data-rank="2"] .rank { color: var(--silver); }
+.board-row[data-rank="3"] .rank { color: var(--bronze); }
+.board-row.is-you { outline: 2px solid var(--brand); }
+
+/* --------------------------------------------------------------- media --- */
+
+.media-block {
+  border-radius: var(--r-lg); overflow: hidden;
+  background: #000; border: 1px solid var(--border);
+  display: grid; place-items: center;
+  max-height: 42vh;
+}
+.media-block img, .media-block video { max-height: 42vh; width: auto; margin: 0 auto; }
+.media-block--sm { max-height: 24vh; }
+.media-block--sm img, .media-block--sm video { max-height: 24vh; }
+
+.media-drop {
+  border: 2px dashed var(--border); border-radius: var(--r-md);
+  padding: var(--sp-4); text-align: center; color: var(--muted);
+  cursor: pointer; transition: border-color .15s ease, background .15s ease;
+}
+.media-drop:hover, .media-drop.is-over { border-color: var(--brand); background: rgba(123,107,255,.08); }
+
+.video-hint {
+  position: absolute; right: 10px; bottom: 10px;
+  background: rgba(0,0,0,.72); border-radius: 999px; padding: 7px 14px;
+  font-size: .8rem; font-weight: 700; border: 1px solid rgba(255,255,255,.2);
+  cursor: pointer; min-height: 40px; display: inline-flex; align-items: center;
+}
+
+/* --------------------------------------------------------- distribution -- */
+
+.dist { display: flex; flex-direction: column; gap: 7px; }
+.dist-row { display: grid; grid-template-columns: 26px 1fr 56px; align-items: center; gap: 10px; font-size: .85rem; }
+.dist-row .lbl { font-weight: 800; text-align: center; border-radius: 6px; padding: 3px 0; color: #fff; }
+.dist-row[data-opt="0"] .lbl { background: var(--opt-a); }
+.dist-row[data-opt="1"] .lbl { background: var(--opt-b); }
+.dist-row[data-opt="2"] .lbl { background: var(--opt-c); }
+.dist-row[data-opt="3"] .lbl { background: var(--opt-d); }
+.dist-row[data-opt="4"] .lbl { background: var(--opt-e); }
+.dist-row[data-opt="5"] .lbl { background: var(--opt-f); }
+.dist-bar { height: 22px; background: var(--surface-3); border-radius: 6px; overflow: hidden; }
+.dist-bar > i { display: block; height: 100%; background: var(--brand); transition: width .45s cubic-bezier(.2,.8,.2,1); }
+.dist-row.is-correct .dist-bar > i { background: var(--good); }
+.dist-row .val { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------- builder --- */
+
+/* One column at every width: the question editor is the whole page, while
+   session settings live behind a top-bar gear trigger (a popover — see
+   below) instead of competing for space in a permanent sidebar. Capped
+   narrower than `.screen` so long lines of text stay readable on wide
+   monitors. */
+.builder-layout { max-width: 760px; margin: 0 auto; width: 100%; }
+
+/* Time limit + points are both short numbers, so they stay side-by-side at
+   every width and only take the space two number fields actually need. */
+.q-meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 140px)); gap: var(--sp-4); }
+
+/* Shared full-screen scrim behind the settings popover — click (or
+   Escape) anywhere on it to dismiss. */
+.overlay-backdrop {
+  position: fixed; inset: 0; z-index: 40;
+  background: rgba(6, 7, 16, .6);
+  animation: fade-in .15s ease;
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* Session settings, as a small anchored popover under the gear button
+   instead of a permanent card — the same fixed position reads fine on
+   every screen size since it never needs to compete with other content. */
+.settings-popover {
+  position: fixed; z-index: 41;
+  top: calc(var(--tap) + var(--sp-3) * 2 + env(safe-area-inset-top));
+  right: calc(var(--sp-4) + env(safe-area-inset-right));
+  left: calc(var(--sp-4) + env(safe-area-inset-left));
+  margin-left: auto;
+  width: min(360px, calc(100vw - var(--sp-4) * 2 - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  max-height: calc(100vh - var(--tap) - var(--sp-5) * 2);
+  overflow-y: auto;
+  animation: pop-in .15s cubic-bezier(.2, .8, .2, 1);
+}
+@keyframes pop-in { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: none; } }
+
+.opt-editor {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px; border-radius: var(--r-md);
+  background: var(--surface-2); border: 1px solid var(--border);
+}
+.opt-editor.is-correct { border-color: var(--good-deep); background: rgba(52,211,153,.09); }
+.opt-editor .tag {
+  flex: none; width: 34px; height: 34px; border-radius: 9px; color: #fff;
+  display: grid; place-items: center; font-weight: 900; margin-top: 3px;
+}
+.opt-editor[data-opt="0"] .tag { background: var(--opt-a); }
+.opt-editor[data-opt="1"] .tag { background: var(--opt-b); }
+.opt-editor[data-opt="2"] .tag { background: var(--opt-c); }
+.opt-editor[data-opt="3"] .tag { background: var(--opt-d); }
+.opt-editor[data-opt="4"] .tag { background: var(--opt-e); }
+.opt-editor[data-opt="5"] .tag { background: var(--opt-f); }
+
+.pick-correct {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  font-size: .78rem; font-weight: 700; color: var(--muted); white-space: nowrap;
+  min-height: 40px; padding: 0 4px;
+}
+.pick-correct input { accent-color: var(--good); width: 19px; height: 19px; }
+.opt-editor.is-correct .pick-correct { color: var(--good); }
+
+/* An option's picture is the bulkiest field in the editor and a question can
+   have up to six options, so it collapses into a single-line toggle by
+   default rather than always showing the full dropzone/preview. */
+.media-accordion-toggle {
+  display: flex; align-items: center; gap: 9px;
+  width: 100%; min-height: 40px;
+  padding: 7px 10px;
+  border: 1px dashed var(--border); border-radius: var(--r-sm);
+  background: transparent; color: var(--muted);
+  font-size: .82rem; text-align: left; cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, background .15s ease;
+}
+.media-accordion-toggle:hover { border-color: var(--brand-dim); color: var(--text); background: rgba(123, 107, 255, .06); }
+.media-accordion.is-open .media-accordion-toggle {
+  border-style: solid; border-color: var(--brand-dim); color: var(--text);
+}
+.media-accordion-toggle .chevron { flex: none; font-size: .6rem; color: var(--muted-dim); }
+.opt-media-thumb {
+  flex: none; width: 26px; height: 26px; border-radius: 6px;
+  object-fit: cover; background: #000;
+}
+.opt-media-thumb--empty {
+  display: grid; place-items: center; font-size: .95rem; background: var(--surface-3);
+}
+.media-accordion.is-open .media-accordion-toggle { margin-bottom: 2px; }
+
+/* ---------------------------------------------------------- big screen --- */
+
+.bigscreen { font-size: clamp(1rem, 1.6vw, 1.5rem); }
+.bigscreen .q-text { font-size: clamp(1.8rem, 4.4vw, 4rem); font-weight: 900; line-height: 1.1; }
+.bigscreen .answers { gap: var(--sp-4); }
+.bigscreen .answer { min-height: clamp(92px, 13vh, 150px); font-size: clamp(1.1rem, 2.1vw, 2rem); }
+.bigscreen .joincode { font-size: clamp(3rem, 13vw, 9rem); }
+.bigscreen .qr-frame img { max-width: min(38vh, 380px); }
+.bigscreen .board-row { padding: var(--sp-3) var(--sp-4); font-size: clamp(1rem, 1.7vw, 1.6rem); }
+/* A projector has far more vertical room than a phone or laptop screen, so
+   let scrollable panels use it instead of the compact fixed cap. */
+.bigscreen .scroll-panel { max-height: 40vh; }
+
+/* ------------------------------------------------------------ feedback --- */
+
+.verdict-hero {
+  display: grid; place-items: center; gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-4);
+  border-radius: var(--r-xl);
+  animation: rise .4s cubic-bezier(.2, .9, .3, 1);
+}
+.verdict-hero.good { background: linear-gradient(160deg, rgba(52,211,153,.24), transparent 70%); border: 1px solid var(--good-deep); }
+.verdict-hero.bad  { background: linear-gradient(160deg, rgba(251,113,133,.2), transparent 70%); border: 1px solid var(--bad-deep); }
+.verdict-hero .mark { font-size: clamp(3rem, 14vw, 5rem); line-height: 1; }
+.verdict-hero .headline { font-size: clamp(1.5rem, 6vw, 2.2rem); font-weight: 900; }
+.verdict-hero .gain { font-size: 1.35rem; font-weight: 800; color: var(--good); }
+@keyframes rise { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.toast-host {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  z-index: 60; display: flex; flex-direction: column; gap: 8px;
+  width: min(460px, calc(100vw - 24px)); pointer-events: none;
+}
+.toast {
+  background: var(--surface-3); border: 1px solid var(--border);
+  border-radius: var(--r-md); padding: 13px 16px;
+  box-shadow: var(--shadow-lg); font-weight: 600; font-size: .92rem;
+  animation: rise .25s ease;
+}
+.toast.err  { border-color: var(--bad-deep); background: #3b1622; color: #ffdbe2; }
+.toast.ok   { border-color: var(--good-deep); background: #0c2b22; color: #ccf7e8; }
+
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 37%, var(--surface-2) 63%);
+  background-size: 400% 100%; animation: shimmer 1.4s ease infinite;
+  border-radius: var(--r-md);
+}
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* ---------------------------------------------------------------- kpis ---- */
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--sp-3);
+}
+.kpi-tile {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.kpi-value {
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  line-height: 1.1;
+}
+.kpi-label {
+  margin-top: 4px;
+  font-size: .78rem; font-weight: 700; color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- tabs ---- */
+
+.tabs {
+  display: flex; gap: var(--sp-2);
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  appearance: none; background: transparent; border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 4px;
+  min-height: var(--tap);
+  font: inherit; font-weight: 700; font-size: .95rem;
+  color: var(--muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab:hover { color: var(--text); }
+.tab.is-active { color: var(--text); border-bottom-color: var(--brand); }
+
+/* ---------------------------------------------------------- data tables --- */
+
+.table-scroll { overflow-x: auto; }
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .9rem;
+}
+.data-table th, .data-table td {
+  padding: 10px 12px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+.data-table th {
+  font-size: .75rem; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--muted); font-weight: 700;
+  user-select: none;
+}
+.data-table th.is-sortable { cursor: pointer; }
+.data-table th.is-sortable:hover { color: var(--text); }
+.data-table th.is-sorted { color: var(--brand-ink); }
+.data-table .sort-arrow { font-size: .7em; color: var(--brand); }
+.data-table tbody tr:hover { background: var(--surface-2); }
+.data-table tr.is-clickable { cursor: pointer; }
+.data-table tr.data-table-expand { background: var(--surface-2); }
+.data-table tr.data-table-expand:hover { background: var(--surface-2); }
+.data-table tr.data-table-expand > td { white-space: normal; }
+
+/* --------------------------------------------------------------- modal ---- */
+
+.overlay-backdrop--center {
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--sp-4);
+}
+.modal { width: min(440px, 100%); animation: pop-in .15s cubic-bezier(.2, .8, .2, 1); }
+
+/* ------------------------------------------------------------- sticky ---- */
+
+.sticky-bar {
+  position: sticky; bottom: 0; z-index: 20;
+  margin: var(--sp-4) calc(var(--sp-4) * -1) calc(var(--sp-4) * -1);
+  padding: var(--sp-3) var(--sp-4) calc(var(--sp-3) + env(safe-area-inset-bottom));
+  background: rgba(12, 14, 30, .92);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+}
+
+/* The organiser's console and the quiz builder pin their header — brand,
+   session code, connection status, save state — so it is always visible no
+   matter how far down a long lobby, participant list or question editor the
+   organiser has scrolled. */
+.topbar {
+  display: flex; align-items: center; gap: var(--sp-3);
+  flex-wrap: wrap;
+  position: sticky; top: 0; z-index: 15;
+  margin: calc(var(--sp-4) * -1) calc(var(--sp-4) * -1) var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: rgba(10, 12, 24, .85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+/* --------------------------------------------------------- motion pref --- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Small phones: reclaim vertical space so a question plus four options fit
+   on one screen without scrolling. */
+@media (max-height: 700px) and (max-width: 640px) {
+  .screen { padding-top: calc(var(--sp-2) + env(safe-area-inset-top)); }
+  .answer { min-height: 68px; padding: var(--sp-3); font-size: .98rem; }
+  .answer .glyph { width: 34px; height: 34px; }
+  .media-block { max-height: 26vh; }
+  .media-block img, .media-block video { max-height: 26vh; }
+  .card { padding: var(--sp-4); }
+}
+
+/* Landscape phones during a live question: go two-up so nothing is cut off. */
+@media (max-height: 480px) and (orientation: landscape) {
+  .answers { grid-template-columns: 1fr 1fr; }
+  .answer { min-height: 56px; }
+  .media-block { max-height: 30vh; }
+}
+
+@media print {
+  body { background: #fff; color: #000; }
+  .btn, .sticky-bar, .toast-host { display: none !important; }
+}

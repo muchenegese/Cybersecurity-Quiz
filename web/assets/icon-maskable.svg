@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="KwiqTest">
+  <defs>
+    <linearGradient id="gm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7b6bff"/>
+      <stop offset="1" stop-color="#f472b6"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#gm)"/>
+  <path d="M48 44v40M48 64l22-20M48 64l23 20" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="86" cy="81" r="7.5" fill="#fff"/>
+</svg>

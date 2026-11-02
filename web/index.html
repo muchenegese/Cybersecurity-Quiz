@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KwiqTest — live quizzes, no install</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Host a live multiple-choice quiz. Participants join instantly by link or QR code — no app, no signup.">
+<meta name="theme-color" content="#0a0c18">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KwiqTest">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/icon.svg">
+<link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+<div id="app">
+  <div class="screen screen--center">
+    <div class="brandmark"><span class="dot">K</span> KwiqTest</div>
+    <p class="muted small" style="margin-top:12px">Loading…</p>
+  </div>
+</div>
+<div class="toast-host" id="toasts" role="status" aria-live="polite"></div>
+<noscript>
+  <div class="screen screen--center">
+    <h1>JavaScript required</h1>
+    <p class="muted">KwiqTest needs JavaScript for the live timer and leaderboard. Please enable it and reload.</p>
+  </div>
+</noscript>
+<script src="/assets/app.js"></script>
+</body>
+</html>

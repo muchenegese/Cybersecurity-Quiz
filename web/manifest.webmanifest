@@ -1,0 +1,15 @@
+{
+  "name": "KwiqTest — Live Quiz Platform",
+  "short_name": "KwiqTest",
+  "description": "Host a live multiple-choice quiz. Participants join by link or QR code with no app and no signup.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0c18",
+  "theme_color": "#0a0c18",
+  "icons": [
+    { "src": "/assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/assets/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
