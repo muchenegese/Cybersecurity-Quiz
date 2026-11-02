@@ -199,8 +199,9 @@
   /* ------------------------------------------------------- shared bits --- */
 
   function brandmark(href) {
-    return h('a.brandmark', { href: href || '#/', style: { textDecoration: 'none', color: 'inherit' } },
-      h('span.dot', {}, 'K'), 'KwiqTest');
+    return h('a.brandmark', { href: href || '#/', style: { textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '10px' } },
+      h('img', { src: '/assets/logo.png', alt: 'Logo', style: { height: '32px' } }),
+      'Cybersecurity Quiz'); 
   }
 
   function statusChip(status) {
@@ -1530,13 +1531,15 @@
               st.reveal && st.reveal.noAnswer
                 ? h('p.tiny.muted', { style: { margin: 0 } }, st.reveal.noAnswer + ' did not answer')
                 : null),
-            st.phase === 'reveal'
-              ? h('div.card.stack-2', {},
-                  h('h3', { style: { margin: 0 } }, 'Standings'),
-                  leaderboard(st.leaderboard, null, 8))
-              : h('div.card.stack-2', {},
-                  h('h3', { style: { margin: 0 } }, 'Players'),
-                  peopleList()))),
+            
+            /* --- CHANGED: Show Top Players during live question AND reveal --- */
+            h('div.card.stack-2', {},
+              h('h3', { style: { margin: 0 } }, 'Top players'),
+              leaderboard(st.leaderboard, null, 5)),
+
+            h('div.card.stack-2', {},
+              h('h3', { style: { margin: 0 } }, 'Players'),
+              peopleList()))),
         controlsBar()
       ]);
 
@@ -1738,9 +1741,12 @@
             h('h1', { style: { margin: 0 } }, 'Rank ' + (rank || '–') + ' of ' + (you.of || st.participantCount)),
             h('p.muted', {}, you.score + ' points'),
             mine ? h('span.chip', {}, mine.correct + '/' + mine.answered + ' correct · ' + mine.accuracyPc + '% accuracy') : null),
-          h('div.card.stack-2', {},
+          
+          /* --- CHANGED: Respect the setting to hide final leaderboard --- */
+          st.settings.showLeaderboard && st.leaderboard ? h('div.card.stack-2', {},
             h('h3', { style: { margin: 0 } }, 'Leaderboard'),
-            leaderboard(st.leaderboard, you.id)),
+            leaderboard(st.leaderboard, you.id)) : null,
+
           h('a.btn.btn--ghost.btn--block', { href: '#/' }, 'Done')));
         return;
       }
